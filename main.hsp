@@ -39,5 +39,13 @@ to check all history, please view "history.txt"
 
 
 
-
 ---------------------------------------------------------*/
+*pg_title
+	mes "マジカルクエスト"
+	button "",*game_start_nodate
+	button "",*game_start_continue
+	button "",*pg_end
+	stop
+*game_start_nodate
+*game_start_continue
+*pg_end
