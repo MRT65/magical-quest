@@ -32,20 +32,91 @@
 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　
 
 
-ver 0.00.00.0(α)
-2019/03/19
-
-to check all history, please view "history.txt"
-
-
 
 ---------------------------------------------------------*/
 *pg_title
+	cls
 	mes "マジカルクエスト"
-	button "",*game_start_nodate
-	button "",*game_start_continue
-	button "",*pg_end
+	button "はじめから",*game_start_nodate
+;	button "つづきから",*game_start_continue
+	button "終わる",*pg_end
 	stop
-*game_start_nodate
-*game_start_continue
 *pg_end
+	end
+*game_start_nodate
+	randomize
+	myhp=100
+	goto *game_field_start
+*game_start_continue
+	randomize
+	myhp=100
+	goto *game_field_start
+*game_field_start
+	cls
+	mes "フィールド"
+	button "歩く",*game_field_check
+	stop
+*game_field_check
+	cls
+	if rnd(4) = 0 : goto *buttle_start
+	mes "フィールド"
+	button "歩く",*game_field_check
+	stop
+*buttle_start
+	cls
+	mes "ばとるだー！"
+	enemy_hp = rnd(100)
+	wait 50
+	goto *buttle_myturn
+*buttle_myturn
+	cls
+	mes "あなたのターンらしいです。
+	button "殴る",*buttle_attack
+	button "魔法",*buttle_spell
+	button "逃げる",*buttle_exit
+	stop
+*buttle_attack
+	cls
+	mes "攻撃!"
+	buttle_attackamount = rnd(10)+30
+	enemy_hp -= buttle_attackamount
+	mes "" + buttle_attackamount + "のダメージ！"
+	mes "敵のHPは" + enemy_hp + "！"
+	if enemy_hp < 1 : wait 50 : goto *buttle_win
+	button "次",*buttle_enemy_turn
+	stop
+*buttle_spell
+	cls
+	mes "攻撃!"
+	buttle_attackamount = rnd(70)
+	enemy_hp -= buttle_attackamount
+	mes "" + buttle_attackamount + "のダメージ！"
+	mes "敵のHPは" + enemy_hp + "！"
+	if enemy_hp < 1 : wait 50 : goto *buttle_win
+	button "つぎ",*buttle_enemy_turn
+	stop
+*buttle_exit
+	cls
+	mes "逃げるは恥だが役に立つ"
+	button "戻る",*game_field_start
+	stop
+*buttle_enemy_turn
+	cls
+	mes "攻撃!"
+	buttle_attackamount = rnd(50)
+	myhp -= buttle_attackamount
+	mes "" + buttle_attackamount + "のダメージ！"
+	mes "自分のHPは" + myhp + "！"
+	if myhp < 1 : wait 50 : goto *buttle_lose
+	button "つぎ",*buttle_myturn
+	stop
+*buttle_win
+	cls
+	mes "勝ちました"
+	button "戻る",*game_field_start
+	stop
+*buttle_lose
+	cls
+	mes "負けちゃいました☆テヘペロ"
+	button "タイトルへ",*pg_title
+	stop
