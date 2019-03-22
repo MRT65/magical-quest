@@ -34,22 +34,26 @@
 
 
 ---------------------------------------------------------*/
-*pg_title
+*game_title
 	cls
 	mes "マジカルクエスト"
 	button "はじめから",*game_start_nodate
 ;	button "つづきから",*game_start_continue
-	button "終わる",*pg_end
+	button "終わる",*game_end
 	stop
-*pg_end
+*game_end
 	end
 *game_start_nodate
 	randomize
-	myhp=100
+	common_myhp = 100
+	common_myexp = 0
+	common_mylevel = 0
 	goto *game_field_start
 *game_start_continue
 	randomize
-	myhp=100
+	common_myhp=100
+	common_myexp = 0
+	common_mylevel = 0
 	goto *game_field_start
 *game_field_start
 	cls
@@ -58,65 +62,93 @@
 	stop
 *game_field_check
 	cls
-	if rnd(4) = 0 : goto *buttle_start
+	if rnd(4) = 0 : goto *battle_start
 	mes "フィールド"
 	button "歩く",*game_field_check
 	stop
-*buttle_start
+*battle_start
 	cls
 	mes "ばとるだー！"
-	enemy_hp = rnd(100)
+	enemy_hp = rnd(50)+25
+	battle_enemystrength = enemy_hp
 	wait 50
-	goto *buttle_myturn
-*buttle_myturn
+	goto *battle_myturn
+*battle_myturn
 	cls
 	mes "あなたのターンらしいです。
-	button "殴る",*buttle_attack
-	button "魔法",*buttle_spell
-	button "逃げる",*buttle_exit
+	button "殴る",*battle_attack
+	button "魔法",*battle_spell
+	button "逃げる",*battle_exit
+	if common_mylevel > 0 : button "回復",*battle_recovery
 	stop
-*buttle_attack
+*battle_attack
 	cls
 	mes "攻撃!"
-	buttle_attackamount = rnd(10)+30
-	enemy_hp -= buttle_attackamount
-	mes "" + buttle_attackamount + "のダメージ！"
+	battle_attackamount = rnd(10)+30+rnd(5)*common_mylevel
+	enemy_hp -= battle_attackamount
+	mes "" + battle_attackamount + "のダメージ！"
 	mes "敵のHPは" + enemy_hp + "！"
-	if enemy_hp < 1 : wait 50 : goto *buttle_win
-	button "次",*buttle_enemy_turn
+	if enemy_hp < 1 : wait 50 : goto *battle_win
+	button "次",*battle_enemy_turn
 	stop
-*buttle_spell
+*battle_spell
 	cls
 	mes "攻撃!"
-	buttle_attackamount = rnd(70)
-	enemy_hp -= buttle_attackamount
-	mes "" + buttle_attackamount + "のダメージ！"
+	battle_attackamount = rnd(70+common_mylevel*5)+20
+	enemy_hp -= battle_attackamount
+	mes "" + battle_attackamount + "のダメージ！"
 	mes "敵のHPは" + enemy_hp + "！"
-	if enemy_hp < 1 : wait 50 : goto *buttle_win
-	button "つぎ",*buttle_enemy_turn
+	if enemy_hp < 1 : wait 50 : goto *battle_win
+	button "つぎ",*battle_enemy_turn
 	stop
-*buttle_exit
+*battle_recovery
+	cls
+	mes "回復!"
+	battle_attackamount = rnd(10)+30+common_mylevel*5
+	common_myhp += battle_attackamount
+	mes "" + battle_attackamount + "の回復！"
+	mes "HPは" + common_myhp + "！"
+	if enemy_hp < 1 : wait 50 : goto *battle_win
+	button "次",*battle_enemy_turn
+	stop
+*battle_exit
 	cls
 	mes "逃げるは恥だが役に立つ"
 	button "戻る",*game_field_start
 	stop
-*buttle_enemy_turn
+*battle_enemy_turn
 	cls
 	mes "攻撃!"
-	buttle_attackamount = rnd(50)
-	myhp -= buttle_attackamount
-	mes "" + buttle_attackamount + "のダメージ！"
-	mes "自分のHPは" + myhp + "！"
-	if myhp < 1 : wait 50 : goto *buttle_lose
-	button "つぎ",*buttle_myturn
+	battle_attackamount = rnd(50)
+	common_myhp -= battle_attackamount
+	mes "" + battle_attackamount + "のダメージ！"
+	mes "自分のHPは" + common_myhp + "！"
+	if common_myhp < 1 : wait 50 : goto *battle_lose
+	button "つぎ",*battle_myturn
 	stop
-*buttle_win
+*battle_win
 	cls
 	mes "勝ちました"
+	battle_myexpadd = battle_enemystrength*rnd(100)/200 + battle_enemystrength + 10
+	common_myexp += battle_myexpadd
+	battle_oldlevel = common_mylevel
+	common_mylevel = common_myexp/100
+	battle_remainexp = common_mylevel*100+100-common_myexp
+	mes "経験値を" + battle_myexpadd + "獲得"
+	mes "現在の経験値は" + common_myexp
+	if common_mylevel != battle_oldlevel{
+		mes "レベルが" + common_mylevel + "になった！"
+		mes "攻撃力があがった!"
+		if common_mylevel = 1{
+			mes"回復が使えるようになった！"
+		}
+	}else{
+		mes "現在のレベル:" + common_mylevel + "\n次のレベルまで"+ battle_remainexp
+	}
 	button "戻る",*game_field_start
 	stop
-*buttle_lose
+*battle_lose
 	cls
 	mes "負けちゃいました☆テヘペロ"
-	button "タイトルへ",*pg_title
+	button "タイトルへ",*game_title
 	stop
