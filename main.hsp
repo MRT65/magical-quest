@@ -44,16 +44,33 @@
 *game_end
 	end
 *game_start_nodate
-	randomize
-	common_myhp = 100
-	common_myexp = 0
-	common_mylevel = 0
-	goto *game_field_start
+	mes "セーブデータ作成中..."
+	savedate = "def:none"
+	wait 15
+	goto *game_reset
+/*
 *game_start_continue
+	goto *game_reset
+*/
+*game_reset
 	randomize
-	common_myhp=100
+	mes "初期化中..."
+	common_myhp = 0
 	common_myexp = 0
 	common_mylevel = 0
+	battle_enemystrength = 0
+	battle_attackamount = 0
+	enemy_hp = 0
+	battle_remainexp = 0
+	battle_oldlevel = 0
+	battle_myexpadd = 0
+	i = 0
+	mes "初期化に時間がかかっているかもしれません...""
+	dim item_have
+	mes "初期化終了..."
+	
+	mes "セーブデータの作成中..."//あとでセーブデータ読み込む部分作るとき用。
+	common_myhp = 100
 	goto *game_field_start
 *game_field_start
 	cls
@@ -79,6 +96,7 @@
 	button "殴る",*battle_attack
 	button "魔法",*battle_spell
 	button "逃げる",*battle_exit
+	button "アイテム",*battle_item
 	if common_mylevel > 0 : button "回復",*battle_recovery
 	stop
 *battle_attack
@@ -109,6 +127,25 @@
 	mes "" + battle_attackamount + "の回復！"
 	mes "HPは" + common_myhp + "！"
 	if enemy_hp < 1 : wait 50 : goto *battle_win
+	button "次",*battle_enemy_turn
+	stop
+*battle_item
+	cls
+	mes "どれを使う?"
+	pos 0,20
+	button "薬草",*battle_usemedicine
+	pos 100,20
+	mes item_have(0)
+	pos 0,40
+	button "やめる",*battle_myturn
+	stop
+*battle_usemedicine
+	cls
+	mes "薬草を使った"
+	i = rnd(10)+30
+	mes "HPが" + i +"増えた!"
+	common_myhp += i
+	i = 0
 	button "次",*battle_enemy_turn
 	stop
 *battle_exit
