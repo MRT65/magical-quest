@@ -34,6 +34,25 @@
 
 
 ---------------------------------------------------------*/
+	randomize
+	mes "初期化中..."
+	common_myhp = 0
+	common_myexp = 0
+	common_mylevel = 0
+	battle_enemystrength = 0
+	battle_attackamount = 0
+	enemy_hp = 0
+	battle_remainexp = 0
+	battle_oldlevel = 0
+	battle_myexpadd = 0
+	game_savedatep = 0
+	i = 0
+	wait 15
+	mes "初期化に時間がかかっているかもしれません..."
+	dim item_have
+	wait 30
+	mes "初期化終了..."
+	wait 20
 *game_title
 	cls
 	mes "マジカルクエスト"
@@ -44,30 +63,24 @@
 *game_end
 	end
 *game_start_nodate
-	randomize
-	common_myhp = 0
-	common_myexp = 0
-	common_mylevel = 0
-	battle_enemystrength = 0
-	battle_attackamount = 0
-	enemy_hp = 0
-	battle_remainexp = 0
-	battle_oldlevel = 0
-	battle_myexpadd = 0
-	i = 0
-	dim item_have
-	
-	
-	common_myhp = 100
-	goto *game_field_start
+	cls
+	mes "セーブデータ作成中..."
+	game_savedatep = "def:none"
+	wait 30
+	goto *game_reset
 /*
 *game_start_continue
-	randomize
-	common_myhp=100
-	common_myexp = 0
-	common_mylevel = 0
-	goto *game_field_start
+	cls
+	goto *game_reset
 */
+*game_reset
+	
+	if game_savedatep == "def:none"{
+		common_myhp = 100
+	}
+	mes "セーブデータの読み込み中..."//あとでセーブデータ読み込む部分作るとき用。
+	wait 30
+	goto *game_field_start
 *game_field_start
 	cls
 	mes "フィールド"
@@ -75,7 +88,9 @@
 	stop
 *game_field_check
 	cls
-	if rnd(4) = 0 : goto *battle_start
+	if rnd(4) = 0 {
+		goto *battle_start
+	}
 	mes "フィールド"
 	button "歩く",*game_field_check
 	stop
@@ -93,7 +108,9 @@
 	button "魔法",*battle_spell
 	button "逃げる",*battle_exit
 	button "アイテム",*battle_item
-	if common_mylevel > 0 : button "回復",*battle_recovery
+	if common_mylevel > 0 {
+		button "回復",*battle_recovery
+	}
 	stop
 *battle_attack
 	cls
@@ -102,7 +119,10 @@
 	enemy_hp -= battle_attackamount
 	mes "" + battle_attackamount + "のダメージ！"
 	mes "敵のHPは" + enemy_hp + "！"
-	if enemy_hp < 1 : wait 50 : goto *battle_win
+	if enemy_hp < 1 {
+		wait 50
+		goto *battle_win
+	}
 	button "次",*battle_enemy_turn
 	stop
 *battle_spell
@@ -112,7 +132,10 @@
 	enemy_hp -= battle_attackamount
 	mes "" + battle_attackamount + "のダメージ！"
 	mes "敵のHPは" + enemy_hp + "！"
-	if enemy_hp < 1 : wait 50 : goto *battle_win
+	if enemy_hp < 1{
+		wait 50
+		goto *battle_win
+	}
 	button "つぎ",*battle_enemy_turn
 	stop
 *battle_recovery
@@ -122,7 +145,10 @@
 	common_myhp += battle_attackamount
 	mes "" + battle_attackamount + "の回復！"
 	mes "HPは" + common_myhp + "！"
-	if enemy_hp < 1 : wait 50 : goto *battle_win
+	if enemy_hp < 1 {
+		wait 50
+		goto *battle_win
+	}
 	button "次",*battle_enemy_turn
 	stop
 *battle_item
@@ -140,6 +166,7 @@
 	mes "薬草を使った"
 	i = rnd(10)+30
 	mes "HPが" + i +"増えた!"
+	item_have(0) --
 	common_myhp += i
 	i = 0
 	button "次",*battle_enemy_turn
@@ -156,7 +183,10 @@
 	common_myhp -= battle_attackamount
 	mes "" + battle_attackamount + "のダメージ！"
 	mes "自分のHPは" + common_myhp + "！"
-	if common_myhp < 1 : wait 50 : goto *battle_lose
+	if common_myhp < 1 {
+		wait 50
+		goto *battle_lose
+	}
 	button "つぎ",*battle_myturn
 	stop
 *battle_win
@@ -177,6 +207,10 @@
 		}
 	}else{
 		mes "現在のレベル:" + common_mylevel + "\n次のレベルまで"+ battle_remainexp
+	}
+	if rnd(4) = 1 {
+		mes "薬草を手に入れた!"
+		item_have(0) ++
 	}
 	button "戻る",*game_field_start
 	stop
