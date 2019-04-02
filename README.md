@@ -20,7 +20,11 @@ it will complete in **2021,september.**
 
 
 **now stage situation**
+
 making basic : 25.0 %complete in 20h
+
 make field   : 10.0 %complete in  5h
+
 make battle  : 70.0 %complete in  5h
+
 make other   : 10.0 %complete in 10h
