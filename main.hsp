@@ -46,10 +46,15 @@
 	battle_oldlevel = 0
 	battle_myexpadd = 0
 	game_savedatep = 0
+	game_load_status = 0
 	i = 0
+	j = 0
+	k = 0
+	wtext = ""
 	wait 15
 	mes "初期化に時間がかかっているかもしれません..."
 	dim item_have
+	
 	wait 30
 	mes "初期化終了..."
 	wait 20
@@ -66,6 +71,7 @@
 	cls
 	mes "セーブデータ作成中..."
 	game_savedatep = "def:none"
+	common_myhp = 100
 	wait 30
 	goto *game_reset
 /*
@@ -74,11 +80,38 @@
 	goto *game_reset
 */
 *game_reset
+	wait 15
 	
-	if game_savedatep == "def:none"{
-		common_myhp = 100
-	}
-	mes "セーブデータの読み込み中..."//あとでセーブデータ読み込む部分作るとき用。
+	mes "敵の情報を読み込んでいます..."
+	notesel wtext
+	noteload "enemy.txt"
+	wait 15
+	mes "敵の情報を解析しています..."
+	i = 0		;現在の行
+	repeat
+		k = 0					;読み込みフラグ
+		if i == notemax {
+			break
+		}
+		if i == "start" {
+			game_load_status = 1
+			i ++
+			k = 1
+		}
+		if i == "end" {
+			game_load_status = 0
+			i ++
+			k = 1
+		}
+		if i == "comment" {
+			i += 2
+			k = 1
+		}
+	loop
+
+
+
+	
 	wait 30
 	goto *game_field_start
 *game_field_start
