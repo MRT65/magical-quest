@@ -1,30 +1,30 @@
 # magical-quest
-the magical quest, which made by us.
+The Magical Quest, which made by us.
 
 
 
-**plan**
+**Plan**
 
-we develop it from september,2019 in earnest.
+We develop it from september,2019 in earnest.
 
-it will complete in **2021,september.**
-
-
+It will complete in **2021,september.**
 
 
-**current situation**
+
+
+**Current situation**
 
 1.500 % completed in April,4th.
 
 
 
 
-**now stage situation**
+**Now stage situation**
 
-making basic : 45.0 %complete in 20h
+Making basic : 45.0 %complete in 20h
 
-make field   : 10.0 %complete in  5h
+Make field   : 10.0 %complete in  5h
 
-make battle  : 70.0 %complete in  5h
+Make battle  : 70.0 %complete in  5h
 
-make other   : 50.0 %complete in 10h
+Make other   : 50.0 %complete in 10h
