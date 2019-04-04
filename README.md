@@ -21,10 +21,10 @@ It will complete in **2021,september.**
 
 **Now stage situation**
 
-Making basic : 45.0 %complete in 20h
+Making basic : 55.0 %complete in 20h
 
-Make field   : 10.0 %complete in  5h
+Make field   : 20.0 %complete in  5h
 
-Make battle  : 70.0 %complete in  5h
+Make battle  : 80.0 %complete in  5h
 
-Make other   : 50.0 %complete in 10h
+Make other   : 60.0 %complete in 10h
