@@ -71,7 +71,11 @@
 	dim enemyhp
 	dim enemyimg
 	dim enemyhpr
-
+	dim enemyApr
+	dim enemyAP
+	dim enemyExp
+	dim enemyExpr
+	
 	log "配列初期化完了"
 	
 	wait 30
@@ -120,7 +124,7 @@
 				j ++
 			}else{
 				prog_debug1 = "敵の情報ファイルが破損しています。"
-				prog_debug2 = "エラー番号はE100です。"
+				prog_debug2 = "エラー番号は@E100です。製作者に報告してください。"
 				goto *prog_error
 			}
 			k = 1
@@ -136,27 +140,103 @@
 		}
 		if i == "Name" {
 			noteget wtext,i+1
-			enemy_name(j) = wtext
-			i += 2
-			k = 1
+			if game_load_status = 0 {
+				enemy_name(j) = wtext
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E101です。製作者に報告してください。"
+				goto *prog_error
+			}
+			
 		}
 		if i == "ImagePos" {
 			noteget wtext,i+1
-			enemyimg(j) = wtext
+			if game_load_status = 0 {
+				enemyimg(j) = wtext
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E102です。製作者に報告してください。"
+				goto *prog_error
+			}
+
+		}
+		if i == "HP" {
+			noteget wtext,i+1
+			if game_load_status = 0 {
+				enemyhp(j) = wtext
+			i += 2
+			k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E103です。製作者に報告してください。"
+				goto *prog_error
+			}
+			
+		}
+		if i == "HPRange" {
+			noteget wtext,i+1
+			if game_load_status = 0 {
+				enemyhpr(j) = wtext
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				goto *prog_error
+			}
+			
+		}
+		if i == "AttackPower" {
+			noteget wtext,i+1
+			if game_load_status = 0 {
+				enemyAP(j) = wtext
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				goto *prog_error
+			}
+		}
+		if i == "AtpRange" {
+			noteget wtext,i+1
+			if game_load_status = 0 {
+				enemyARr(j) = wtext
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				goto *prog_error
+			}
+			
+		}
+		if i == "GetExp" {
+			noteget wtext,i+1
+			enemyExp(j) = wtext
 			i += 2
 			k = 1
 		}
-		if i == "Name" {
+		if i == "GetExpRange" {
 			noteget wtext,i+1
-			enemy_name(j) = wtext
+			enemyExpr(j) = wtext
 			i += 2
 			k = 1
 		}
-		if i == "Name" {
+		if i == "version" {
 			noteget wtext,i+1
-			enemy_name(j) = wtext
-			i += 2
-			k = 1
+			if wtext == "1" {
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが未対応のバージョンです。"
+				prog_debug2 = "エラー番号は@E110です。製作者に報告してください。"
+				goto *prog_error
+			}
 		}
 	loop
 	wtext = ""
@@ -330,6 +410,7 @@
 	}
 	if wparam = 2 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "原因はプログラムの書き方が間違っていたことです。"
 		mes "このエラーはたいてい制作者のミスです。"
 		mes "報告をお願いします。"
 	}
@@ -426,5 +507,127 @@
 		mes "一般に、このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
 		mes "このエラーはたいてい制作者のミスです。"
 		mes "報告をお願いします。"
+	}
+	if wparam = 20 {
+		mes "メモリの取得に失敗しました。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
 	
+	}
+	if wparam = 21 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 22 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です
+		mes "このエラーは致命的です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 23 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 24 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 25 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 26 {
+		mes "このエラーは主にメモリが確保できなかったことが原因です。"
+		mes "このエラーは致命的です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 27 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 28 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 29 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 30 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 31 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 32 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 33 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 34 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 35 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 36 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 37 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 38 {
+		mes "このエラーはDLLファイルの破損が原因です。"
+		mes "必要なファイルを削除していないか確認してください。"
+	}
+	if wparam = 39 {
+		mes "このエラーは外部ファイルの破損が原因です。"
+		mes "必要なファイルを削除していないか確認してください。"
+		mes "それでも再度起こる場合、報告をお願いします。"
+	}
+	if wparam = 40 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 41 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
 	}
