@@ -34,6 +34,12 @@
 
 
 ---------------------------------------------------------*/
+#define log prog_debuglog = prog_debuglog + "\n" +
+#define pday gettime(0) + "/"+ gettime(1) + "/" + gettime(3) + " "
+#define ptime gettime(4) + ":" + gettime(5) + ":" + gettime(6) + "." gettime(7)
+
+
+
 	onerror goto *prog_error
 	
 	randomize
@@ -53,9 +59,20 @@
 	j = 0
 	k = 0
 	wtext = ""
+	prog_debuglog = ""
+	
+	log "変数初期化完了"
+	
 	wait 15
 	mes "初期化に時間がかかっているかもしれません..."
+	
 	dim item_have
+	sdim enemy_name
+	dim enemyhp
+	dim enemyimg
+	dim enemyhpr
+
+	log "配列初期化完了"
 	
 	wait 30
 	mes "初期化終了..."
@@ -102,6 +119,8 @@
 				i ++
 				j ++
 			}else{
+				prog_debug1 = "敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号はE100です。"
 				goto *prog_error
 			}
 			k = 1
@@ -116,14 +135,33 @@
 			k = 1
 		}
 		if i == "Name" {
-			
+			noteget wtext,i+1
+			enemy_name(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "ImagePos" {
+			noteget wtext,i+1
+			enemyimg(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "Name" {
+			noteget wtext,i+1
+			enemy_name(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "Name" {
+			noteget wtext,i+1
+			enemy_name(j) = wtext
 			i += 2
 			k = 1
 		}
 	loop
-
-
-
+	wtext = ""
+	
+	
 	
 	wait 30
 	goto *game_field_start
@@ -303,7 +341,7 @@
 	if wparam = 4 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
 		mes "このエラーはたいてい制作者のミスです。"
-		mes "報告をお願いします。""
+		mes "報告をお願いします。"
 	}
 	if wparam = 5 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
@@ -318,7 +356,7 @@
 	if wparam = 7 {
 		mes "このエラーは不正なメモリにアクセスしたことが原因です。"
 		mes "ユーザに原因がある場合がありますが、多くは制作者のミスです。"
-		mes "報告をお願いします。""
+		mes "報告をお願いします。"
 	}
 	if wparam = 8 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"

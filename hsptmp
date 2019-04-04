@@ -34,6 +34,14 @@
 
 
 ---------------------------------------------------------*/
+#define log prog_debuglog = prog_debuglog + "\n" +
+#define pday gettime(0) + "/"+ gettime(1) + "/" + gettime(3) + " "
+#define ptime gettime(4) + ":" + gettime(5) + ":" + gettime(6) + "." gettime(7)
+
+
+
+	onerror goto *prog_error
+	
 	randomize
 	mes "初期化中..."
 	common_myhp = 0
@@ -51,9 +59,20 @@
 	j = 0
 	k = 0
 	wtext = ""
+	prog_debuglog = ""
+	
+	log "変数初期化完了"
+	
 	wait 15
 	mes "初期化に時間がかかっているかもしれません..."
+	
 	dim item_have
+	sdim enemy_name
+	dim enemyhp
+	dim enemyimg
+	dim enemyhpr
+
+	log "配列初期化完了"
 	
 	wait 30
 	mes "初期化終了..."
@@ -71,6 +90,7 @@
 	cls
 	mes "セーブデータ作成中..."
 	game_savedatep = "def:none"
+	common_myhp = 100
 	wait 30
 	goto *game_reset
 /*
@@ -79,46 +99,69 @@
 	goto *game_reset
 */
 *game_reset
-	
-	if game_savedatep == "def:none"{
-		common_myhp = 100
-	}
-	mes "セーブデータの読み込み中..."//あとでセーブデータ読み込む部分作るとき用。
 	wait 15
-
-
 	
 	mes "敵の情報を読み込んでいます..."
 	notesel wtext
 	noteload "enemy.txt"
 	wait 15
 	mes "敵の情報を解析しています..."
-	i = 0
-	j = 0
+	i = 0		;現在の行
+	j = 0		;現在の敵ID
 	repeat
-		i ++
 		k = 0					;読み込みフラグ
 		if i == notemax {
 			break
 		}
-		if j == "start" {
-			game_load_status = 1
-			j ++
+		if i == "start" {
+			if game_load_status = 0 {
+				game_load_status = 1
+				i ++
+				j ++
+			}else{
+				prog_debug1 = "敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号はE100です。"
+				goto *prog_error
+			}
 			k = 1
 		}
-		if j == "end" {
+		if i == "end" {
 			game_load_status = 0
-			j ++
+			i ++
 			k = 1
 		}
-		if j == "comment" {
-			j += 2
+		if i == "comment" {
+			i += 2
+			k = 1
+		}
+		if i == "Name" {
+			noteget wtext,i+1
+			enemy_name(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "ImagePos" {
+			noteget wtext,i+1
+			enemyimg(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "Name" {
+			noteget wtext,i+1
+			enemy_name(j) = wtext
+			i += 2
+			k = 1
+		}
+		if i == "Name" {
+			noteget wtext,i+1
+			enemy_name(j) = wtext
+			i += 2
 			k = 1
 		}
 	loop
-
-
-
+	wtext = ""
+	
+	
 	
 	wait 30
 	goto *game_field_start
@@ -260,3 +303,128 @@
 	mes "負けちゃいました☆テヘペロ"
 	button "タイトルへ",*game_title
 	stop
+*prog_error
+	boxf 255
+	color
+	mes "エラーが発生しました。"
+	mes "エラーの種類は次の通りです:" + wparam
+	mes "エラーの報告の際には次のエラー番号も教えてください:" + lparam
+	mes "次の数字はおそらく0です:" + iparam
+	mes "さらに次はエラーの原因を示します:" + prog_debug1
+	mes "さらに次はエラーの原因を示します:" + prog_debug2
+	mes
+	mes "問題に覚えがない場合、報告をお願いします。"
+	mes "あなたの報告がこのゲームの改善につながるかもしれません。"
+	mes "次の行にエラー原因が表示されています。推測であるため、間違っている場合もあります。"
+	color ,255
+	
+	if wparam = 0 {
+		mes "上のエラー原因を参照してください。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 1 {
+		mes "このエラーの原因は不明です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+		mes "参考までに、多くの場合は実行ファイル自体の破損が原因です。"
+	}
+	if wparam = 2 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 3 {
+		mes "内部で値が異常になりました。"
+		mes "ユーザに原因がある場合がありますが、多くは制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 4 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 5 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 6 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 7 {
+		mes "このエラーは不正なメモリにアクセスしたことが原因です。"
+		mes "ユーザに原因がある場合がありますが、多くは制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 8 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 9 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 10 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 11 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはゲームを終了せずに特定の部分をプレイしたときに発生しやすいです。"
+		mes "このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 12 {
+		mes "このエラーはファイルの破損が原因です。"
+		mes "このエラーは削除してはいけないファイルを削除したことが原因です。"
+		mes "制作者にご連絡をいただけたら修正できると思われます。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 13 {
+		mes "このエラーは画像ファイルの破損が原因です。"
+		mes "このエラーは削除してはいけないファイルを削除したことが原因です。"
+		mes "制作者にご連絡をいただけたら修正できると思われます。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 14 {
+		mes "このエラーは実行ファイルの破損が原因です。"
+		mes "このエラーはファイルを削除したことが原因です。"
+		mes "制作者にご連絡をいただけたら改善できるかもしれません。"
+		mes "特定の状況で発生する場合、その機能を使用しないことが可能ならそうするべきです。"
+	}
+	if wparam = 15 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはゲームを終了せずに特定の部分をプレイしたときに発生しやすいです。"
+		mes "このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 16 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	}
+	if wparam = 17 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 18 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
+	if wparam = 19 {
+		mes "このエラーはプログラムの内容が間違っていることが原因です。"
+		mes "ちなみに原因は0で除算したことが原因です。"
+		mes "一般に、このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "このエラーはたいてい制作者のミスです。"
+		mes "報告をお願いします。"
+	
+	}
