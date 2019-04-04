@@ -1,3 +1,5 @@
+version
+1
 start
 Name
 Žã‚¢“G
@@ -60,5 +62,3 @@ GetExp
 GetExpRange
 0
 End
-
-

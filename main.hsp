@@ -59,8 +59,9 @@
 	j = 0
 	k = 0
 	wtext = ""
+	wtext2 = ""
 	prog_debuglog = ""
-	
+	enemydate = ""
 	log "変数初期化完了"
 	
 	wait 15
@@ -106,18 +107,21 @@
 	wait 15
 	
 	mes "敵の情報を読み込んでいます..."
-	notesel wtext
+	notesel enemydate
 	noteload "enemy.txt"
 	wait 15
 	mes "敵の情報を解析しています..."
 	i = 0		;現在の行
 	j = 0		;現在の敵ID
+	mes noteinfo(0)
 	repeat
 		k = 0					;読み込みフラグ
-		if i == notemax {
+		noteget wtext2,i
+		if i = 63 : mes "a" : wait 100
+		if i >= noteinfo(0) {
 			break
 		}
-		if i == "start" {
+		if wtext2 == "start" {
 			if game_load_status = 0 {
 				game_load_status = 1
 				i ++
@@ -129,18 +133,24 @@
 			}
 			k = 1
 		}
-		if i == "end" {
-			game_load_status = 0
-			i ++
-			k = 1
+		if wtext2 == "End" {
+			if game_load_status = 0 {
+				prog_debug1 = "敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E150です。製作者に報告してください。"
+				goto *prog_error
+			}else{
+				game_load_status = 0
+				i ++
+				k = 1
+			}
 		}
-		if i == "comment" {
+		if wtext2 == "comment" {
 			i += 2
 			k = 1
 		}
-		if i == "Name" {
+		if wtext2 == "Name" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
+			if game_load_status = 1 {
 				enemy_name(j) = wtext
 				i += 2
 				k = 1
@@ -151,10 +161,10 @@
 			}
 			
 		}
-		if i == "ImagePos" {
+		if wtext2 == "ImagePos" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
-				enemyimg(j) = wtext
+			if game_load_status = 1 {
+				enemyimg(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -164,10 +174,10 @@
 			}
 
 		}
-		if i == "HP" {
+		if wtext2 == "HP" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
-				enemyhp(j) = wtext
+			if game_load_status = 1 {
+				enemyhp(j) = int(wtext)
 			i += 2
 			k = 1
 			}else{
@@ -177,10 +187,10 @@
 			}
 			
 		}
-		if i == "HPRange" {
+		if wtext2 == "HPRange" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
-				enemyhpr(j) = wtext
+			if game_load_status = 1 {
+				enemyhpr(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -190,57 +200,77 @@
 			}
 			
 		}
-		if i == "AttackPower" {
+		if wtext2 == "AttackPower" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
-				enemyAP(j) = wtext
+			if game_load_status = 1 {
+				enemyAP(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
-				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				prog_debug2 = "エラー番号は@E105です。製作者に報告してください。"
 				goto *prog_error
 			}
 		}
-		if i == "AtpRange" {
+		if wtext2 == "AtpRange" {
 			noteget wtext,i+1
-			if game_load_status = 0 {
-				enemyARr(j) = wtext
+			if game_load_status = 1 {
+				enemyARr(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
-				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				prog_debug2 = "エラー番号は@E106です。製作者に報告してください。"
 				goto *prog_error
 			}
 			
 		}
-		if i == "GetExp" {
+		if wtext2 == "GetExp" {
 			noteget wtext,i+1
-			enemyExp(j) = wtext
-			i += 2
-			k = 1
+			if game_load_status = 1 {
+				enemyExp(j) = int(wtext)
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E107です。製作者に報告してください。"
+				goto *prog_error
+			}
 		}
-		if i == "GetExpRange" {
+		if wtext2 == "GetExpRange" {
 			noteget wtext,i+1
-			enemyExpr(j) = wtext
-			i += 2
-			k = 1
+			if game_load_status = 1 {
+				enemyExpr(j) = int(wtext)
+				i += 2
+				k = 1
+			}else{
+				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+				prog_debug2 = "エラー番号は@E108です。製作者に報告してください。"
+				goto *prog_error
+			}
+			
 		}
-		if i == "version" {
+		if wtext2 == "version" {
 			noteget wtext,i+1
+			wait 100
 			if wtext == "1" {
 				i += 2
 				k = 1
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが未対応のバージョンです。"
-				prog_debug2 = "エラー番号は@E110です。製作者に報告してください。"
+				prog_debug2 = "エラー番号は@E130です。製作者に報告してください。"
 				goto *prog_error
 			}
 		}
+		if k == 0 {
+			prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
+			prog_debug2 = "エラー番号は@E140です。製作者に報告してください。"
+			goto *prog_error
+		}
+		await
 	loop
 	wtext = ""
-	
+	wtext = ""
 	
 	
 	wait 30
@@ -384,14 +414,23 @@
 	button "タイトルへ",*game_title
 	stop
 *prog_error
-	boxf 255
+	screen 0,640,480
+	cls
+	pos 0,0
+	color 255
+	font msgothic,18,1
+	boxf
 	color
 	mes "エラーが発生しました。"
 	mes "エラーの種類は次の通りです:" + wparam
 	mes "エラーの報告の際には次のエラー番号も教えてください:" + lparam
-	mes "次の数字はおそらく0です:" + iparam
-	mes "さらに次はエラーの原因を示します:" + prog_debug1
-	mes "さらに次はエラーの原因を示します:" + prog_debug2
+	if iparam != 0 {
+		color 255,255,255
+		mes "iパラメータの値:" + iparam
+		color
+	}
+	mes "エラーの原因:" + prog_debug1
+	mes "エラーの原因:" + prog_debug2
 	mes
 	mes "問題に覚えがない場合、報告をお願いします。"
 	mes "あなたの報告がこのゲームの改善につながるかもしれません。"
@@ -631,3 +670,14 @@
 		mes "このエラーはたいてい制作者のミスです。"
 		mes "報告をお願いします。"
 	}
+	font msgothic,18
+	color 255,255,255
+	mes "報告の手順"
+	mes "①、次の数字を伝える。"
+	if prog_debug1 == "" {
+		mes "" + wparam + "/" + lparam + "/1"
+	}else{
+		mes "" + wparam + "/" + lparam + "/0"
+	}
+	mes "②、何をしていたらこうなったのか伝える。"
+	mes "③、自分の連絡先を告げる。"
