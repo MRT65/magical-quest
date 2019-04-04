@@ -50,7 +50,6 @@
 	common_myhp = 0
 	common_myexp = 0
 	common_mylevel = 0
-	battle_enemystrength = 0
 	battle_attackamount = 0
 	enemy_hp = 0
 	battle_remainexp = 0
@@ -71,20 +70,21 @@
 	wtext2 = ""
 	prog_debuglog = ""
 	enemydate = ""
+	enemy_name = ""
 	log "変数初期化完了"
 	
 	wait 15
 	mes "初期化に時間がかかっているかもしれません..."
 *prog_dim
 	dim item_have
-	sdim enemy_name
-	dim enemyhp
-	dim enemyimg
-	dim enemyhpr
-	dim enemyApr
-	dim enemyAP
-	dim enemyExp
-	dim enemyExpr
+	sdim enemies_name
+	dim enemiesHP
+	dim enemiesimg
+	dim enemieshpr
+	dim enemiesAPr
+	dim enemiesAP
+	dim enemiesExp
+	dim enemiesExpr
 	
 	log "配列初期化完了" + ptime
 	
@@ -159,7 +159,7 @@
 		if wtext2 == "Name" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemy_name(j) = wtext
+				enemies_name(j) = wtext
 				i += 2
 				k = 1
 			}else{
@@ -172,7 +172,7 @@
 		if wtext2 == "ImagePos" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyimg(j) = int(wtext)
+				enemiesimg(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -185,7 +185,7 @@
 		if wtext2 == "HP" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyhp(j) = int(wtext)
+				enemieshp(j) = int(wtext)
 			i += 2
 			k = 1
 			}else{
@@ -198,7 +198,7 @@
 		if wtext2 == "HPRange" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyhpr(j) = int(wtext)
+				enemieshpr(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -211,7 +211,7 @@
 		if wtext2 == "AttackPower" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyAP(j) = int(wtext)
+				enemiesAP(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -223,7 +223,7 @@
 		if wtext2 == "AtpRange" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyApr(j) = int(wtext)
+				enemiesAPr(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -236,7 +236,7 @@
 		if wtext2 == "GetExp" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyExp(j) = int(wtext)
+				enemiesExp(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -248,7 +248,7 @@
 		if wtext2 == "GetExpRange" {
 			noteget wtext,i+1
 			if game_load_status = 1 {
-				enemyExpr(j) = int(wtext)
+				enemiesExpr(j) = int(wtext)
 				i += 2
 				k = 1
 			}else{
@@ -334,20 +334,22 @@
 		battle_currentenemyID = 3
 		goto *battle_start
 	}
-	
+	if i == 9 {
+		goto *stage_clear
+	}
 	mes "フィールド"
 	button "歩く",*game_field_check
 	stop
 *battle_start
 	cls
-	mes "ばとるだー！"
-	enemy_hp = rnd(50)+25
-	battle_enemystrength = enemy_hp
+	enemy_hp = rnd(enemieshpr(battle_currentenemyID)) + enemieshp(battle_currentenemyID)
+	enemy_name = enemies_name(battle_currentenemyID)
+	mes "" + enemy_name + "が現れた!"
 	wait 50
 	goto *battle_myturn
 *battle_myturn
 	cls
-	mes "あなたのターンらしいです。
+	mes "あなたのターンです。
 	button "殴る",*battle_attack
 	button "魔法",*battle_spell
 	button "逃げる",*battle_exit
@@ -407,6 +409,11 @@
 	stop
 *battle_usemedicine
 	cls
+	if item_have(0) <= 0 {
+		mes "アイテムが足りない"
+		button "戻る",*battle_item
+		stop
+	}
 	mes "薬草を使った"
 	i = rnd(10)+30
 	mes "HPが" + i +"増えた!"
@@ -423,7 +430,7 @@
 *battle_enemy_turn
 	cls
 	mes "攻撃!"
-	battle_attackamount = rnd(50)
+	battle_attackamount = enemiesAP(battle_currentenemyID) + rnd(enemiesAPr(battle_currentenemyID))
 	common_myhp -= battle_attackamount
 	mes "" + battle_attackamount + "のダメージ！"
 	mes "自分のHPは" + common_myhp + "！"
@@ -436,7 +443,7 @@
 *battle_win
 	cls
 	mes "勝ちました"
-	battle_myexpadd = battle_enemystrength*rnd(100)/200 + battle_enemystrength + 10
+	battle_myexpadd = enemiesExp(battle_currentenemyID) + rnd(enemiesExpr(battle_currentenemyID))
 	common_myexp += battle_myexpadd
 	battle_oldlevel = common_mylevel
 	common_mylevel = common_myexp/100
@@ -461,7 +468,11 @@
 *battle_lose
 	cls
 	mes "負けちゃいました☆テヘペロ"
-	button "タイトルへ",*game_title
+	stop
+*stage_clear
+	cls
+	mes "ステージクリア!"
+	button "戻る",*base_top
 	stop
 *prog_error
 	screen 0,640,480
@@ -484,7 +495,8 @@
 	mes
 	mes "問題に覚えがない場合、報告をお願いします。"
 	mes "あなたの報告がこのゲームの改善につながるかもしれません。"
-	mes "次の行にエラー原因が表示されています。推測であるため、間違っている場合もあります。"
+	mes "次の行にエラー原因が表示されています。"
+	mes "※推測であるため、間違っている場合もあります。"
 	color ,255
 	
 	if wparam = 0 {
@@ -545,8 +557,9 @@
 	}
 	if wparam = 11 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
-		mes "このエラーはゲームを終了せずに特定の部分をプレイしたときに発生しやすいです。"
-		mes "このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "このエラーはゲームを終了せずに特定の部分をプレイしたときに発生
+		mes "しやすいです。"
+		mes "このエラーはチートを使用しているなどの場合を除き制作者のミスです。"
 		mes "報告をお願いします。"
 	}
 	if wparam = 12 {
@@ -565,12 +578,14 @@
 		mes "このエラーは実行ファイルの破損が原因です。"
 		mes "このエラーはファイルを削除したことが原因です。"
 		mes "制作者にご連絡をいただけたら改善できるかもしれません。"
-		mes "特定の状況で発生する場合、その機能を使用しないことが可能ならそうするべきです。"
+		mes "特定の状況で発生する場合、その機能を使用しないことが可能なら"
+		mes "そうしてください。"
 	}
 	if wparam = 15 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
-		mes "このエラーはゲームを終了せずに特定の部分をプレイしたときに発生しやすいです。"
-		mes "このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "このエラーはゲームを終了せずに特定の部分を"
+		mes "繰り返しプレイしたときに発生しやすいです。"
+		mes "このエラーはチートを使用しているなどの場合を除き制作者のミスです。"
 		mes "報告をお願いします。"
 	}
 	if wparam = 16 {
@@ -593,7 +608,7 @@
 	if wparam = 19 {
 		mes "このエラーはプログラムの内容が間違っていることが原因です。"
 		mes "ちなみに原因は0で除算したことが原因です。"
-		mes "一般に、このエラーはチートを使用しているなど一部の場合を除き制作者のミスです。"
+		mes "一般に、このエラーは一部の場合を除き制作者のミスです。"
 		mes "このエラーはたいてい制作者のミスです。"
 		mes "報告をお願いします。"
 	}
@@ -725,9 +740,14 @@
 	mes "報告の手順"
 	mes "①、次の数字を伝える。"
 	if prog_debug1 == "" {
-		mes "" + wparam + "/" + lparam + "/1"
+		mes "" + wparam + "-" + lparam + "-1"
+		mes "②、何をしていたらこうなったのか伝える。"
+		mes "③、自分の連絡先を告げる。"
 	}else{
-		mes "" + wparam + "/" + lparam + "/0"
+		mes "" + wparam + "-" + lparam + "-0"
+		mes "②、何をしていたらこうなったのか伝える。"
+		mes "③、自分の連絡先を告げる。"
+		mes "次のエラーメッセージを告げる。"
+		mes prog_debug1
+		mes prog_debug2
 	}
-	mes "②、何をしていたらこうなったのか伝える。"
-	mes "③、自分の連絡先を告げる。"
