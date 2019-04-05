@@ -18,7 +18,7 @@ comment
 AtpRange
 5
 GetExp
-30
+20
 GetExpRange
 10
 End
@@ -38,9 +38,9 @@ AttackPower
 AtpRange
 5
 GetExp
-50
+40
 GetExpRange
-50
+20
 End
 comment
 -----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ AttackPower
 AtpRange
 15
 GetExp
-100
+80
 GetExpRange
-0
+20
 End
