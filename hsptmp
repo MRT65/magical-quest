@@ -63,7 +63,7 @@
 	k = 0
 	
 	
-	
+	prog_errc = ""
 	prog_debug1 = ""
 	prog_debug2 = ""
 	wtext = ""
@@ -95,7 +95,7 @@
 	cls
 	mes "マジカルクエスト"
 	button "はじめから",*game_start_nodate
-;	button "つづきから",*game_start_continue
+	button "つづきから",*game_start_continue
 	button "終わる",*game_end
 	stop
 *game_end
@@ -107,15 +107,31 @@
 	common_myhp = 100
 	wait 30
 	goto *game_reset
-/*
+
 *game_start_continue
 	cls
+	dialog "svm",16,"マジカルクエストセーブファイル"
+	wtext = ""
+	notesel wtext
+	game_savedatep = refstr
+	noteload game_savedatep
+	noteget i,0
+	if i != 0 {
+		prog_debug1 = "セーブデータのバージョンが異なります。"
+		prog_debug2 = "セーブデータバージョン変換ツールを使用してバージョンを0にしてください"
+		prog_errc = "E160"
+		goto *prog_error
+	}
+	noteget common_myhp,1
+	noteget commoon_myexp,2
+	common_mylevel = common_myexp/100
 	goto *game_reset
-*/
+
 *game_reset
 	wait 15
 	
 	mes "敵の情報を読み込んでいます..."
+	enemydate = ""
 	notesel enemydate
 	noteload "enemy.txt"
 	wait 15
@@ -137,6 +153,7 @@
 			}else{
 				prog_debug1 = "敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E100です。製作者に報告してください。"
+				prog_errc = "E100"
 				goto *prog_error
 			}
 			k = 1
@@ -145,6 +162,7 @@
 			if game_load_status = 0 {
 				prog_debug1 = "敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E150です。製作者に報告してください。"
+				prog_errc = "E150"
 				goto *prog_error
 			}else{
 				game_load_status = 0
@@ -165,6 +183,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E101です。製作者に報告してください。"
+				prog_errc = "E101"
 				goto *prog_error
 			}
 			
@@ -178,6 +197,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E102です。製作者に報告してください。"
+				prog_errc = "E102"
 				goto *prog_error
 			}
 
@@ -191,6 +211,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E103です。製作者に報告してください。"
+				prog_errc = "E103"
 				goto *prog_error
 			}
 			
@@ -204,6 +225,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E104です。製作者に報告してください。"
+				prog_errc = "E104"
 				goto *prog_error
 			}
 			
@@ -217,6 +239,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E105です。製作者に報告してください。"
+				prog_errc = "E105"
 				goto *prog_error
 			}
 		}
@@ -229,6 +252,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E106です。製作者に報告してください。"
+				prog_errc = "E106"
 				goto *prog_error
 			}
 			
@@ -242,6 +266,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E107です。製作者に報告してください。"
+				prog_errc = "E107"
 				goto *prog_error
 			}
 		}
@@ -254,6 +279,7 @@
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 				prog_debug2 = "エラー番号は@E108です。製作者に報告してください。"
+				prog_errc = "E108"
 				goto *prog_error
 			}
 			
@@ -265,13 +291,15 @@
 				k = 1
 			}else{
 				prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが未対応のバージョンです。"
-				prog_debug2 = "エラー番号は@E130です。製作者に報告してください。"
+				prog_debug2 = "実行ファイルと同一の世代の敵情報ファイルをご利用ください。"
+				prog_errc = "E130"
 				goto *prog_error
 			}
 		}
 		if k == 0 {
 			prog_debug1 = "" + i + "行目の、敵ID" + j+ "の敵の情報ファイルが破損しています。"
 			prog_debug2 = "エラー番号は@E140です。製作者に報告してください。"
+			prog_errc = "E140"
 			goto *prog_error
 		}
 		await
@@ -282,6 +310,7 @@
 	
 	wait 30
 	goto *base_top
+*end_load______________________________________________________________________________________________________________________________________________________________
 *base_top
 	cls
 	mes "本拠地です"
@@ -289,6 +318,7 @@
 	button "簡単",*battle_easy
 	button "普通",*battle_mid
 	button "難し",*battle_hard
+	button gosub "保存",*game_save
 	stop
 *battle_easy
 	stage = 0
@@ -474,6 +504,32 @@
 	mes "ステージクリア!"
 	button "戻る",*base_top
 	stop
+*game_save
+	cls
+	mes "セーブしますか?"
+	button "はい",*game_save_real
+	button "いいえ",*game_save_cansel
+	stop
+*game_save_real
+	cls
+	dialog "svm",17,"マジカルクエストセーブファイル"
+	if stat != 1 {
+		mes "セーブに失敗しました"
+		button "戻る",*game_save
+		stop
+	}
+	mes "セーブしています..."
+	wtext = ""
+	notesel wtext
+	noteadd "0"
+	noteadd str(common_myhp)
+	noteadd str(common_myexp)
+	notesave refstr
+	mes "セーブしました"
+	button "戻る",*game_save
+	stop
+*game_save_cansel
+	goto *base_top
 *prog_error
 	screen 0,640,480
 	cls
@@ -740,11 +796,11 @@
 	mes "報告の手順"
 	mes "①、次の数字を伝える。"
 	if prog_debug1 == "" {
-		mes "" + wparam + "-" + lparam + "-1"
+		mes "" + wparam + "-" + lparam + "-0"
 		mes "②、何をしていたらこうなったのか伝える。"
 		mes "③、自分の連絡先を告げる。"
 	}else{
-		mes "" + wparam + "-" + lparam + "-0"
+		mes "" + wparam + "-" + lparam + "-" + prog_errc
 		mes "②、何をしていたらこうなったのか伝える。"
 		mes "③、自分の連絡先を告げる。"
 		mes "次のエラーメッセージを告げる。"
