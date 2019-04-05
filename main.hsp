@@ -116,14 +116,15 @@
 	game_savedatep = refstr
 	noteload game_savedatep
 	noteget i,0
-	if i != 0 {
+	if i != 1 {
 		prog_debug1 = "セーブデータのバージョンが異なります。"
-		prog_debug2 = "セーブデータバージョン変換ツールを使用してバージョンを0にしてください"
+		prog_debug2 = "セーブデータバージョン変換ツールを使用してバージョンを1にしてください"
 		prog_errc = "E160"
 		goto *prog_error
 	}
-	noteget common_myhp,1
-	noteget commoon_myexp,2
+	noteget common_myhp,0
+	noteget commoon_myexp,1
+	noteget item_have(0),2
 	common_mylevel = common_myexp/100
 	goto *game_reset
 
@@ -521,9 +522,10 @@
 	mes "セーブしています..."
 	wtext = ""
 	notesel wtext
-	noteadd "0"
+	noteadd "1"
 	noteadd str(common_myhp)
 	noteadd str(common_myexp)
+	noteadd str(item_have(0))
 	notesave refstr
 	mes "セーブしました"
 	button "戻る",*game_save
